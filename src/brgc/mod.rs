@@ -27,3 +27,15 @@ impl Iterator for Brgc {
         Some(gray)
     }
 }
+
+impl Brgc {
+    pub fn binary_from_gray(gray_code: u32) -> u32 {
+        let mut mask: u32 = gray_code;
+        let mut out = gray_code;
+        while mask != 0 {
+            mask >>= 1;
+            out ^= mask;
+        }
+        out
+    }
+}
