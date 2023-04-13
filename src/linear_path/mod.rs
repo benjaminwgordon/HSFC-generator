@@ -1,4 +1,4 @@
-use std::{error::Error, f32::consts::PI, fs::File, io::Write, path::PathBuf};
+use std::error::Error;
 
 use glam::{Quat, Vec3};
 
@@ -6,25 +6,79 @@ use crate::obj::Obj;
 
 #[derive(Debug)]
 pub struct LinearPath {
-    vertices: Vec<(f32, f32)>,
+    vertices: Vec<(f32, f32, f32)>,
     path: Vec<(usize, usize)>,
 }
 
 impl LinearPath {
-    pub fn from_brgc(iterator: impl Iterator<Item = u32>, length: usize) -> Self {
-        // we can convert gray_code to x,y coordinates by taking alternate bits
-        let vertices: Vec<(f32, f32)> = iterator
+    // given an iterator that generates Binary Reflected Gray Codes, and a target number
+    // of elements to encode, generate a LinearPath representing X,Y,Z coordinates in
+    // a 3d rectangular prism of vertices
+
+    // This can be done by taking every other bit of the BRGC, and assigning it to a
+    // binary encoded whole number representing one coordinate in space
+
+    // e.g. BRGC 011010
+    //           0 -> x : 0
+    //           1 -> y : 1
+    //           1 -> x : 01
+    //           0 -> y : 10
+    //           1 -> x : 011
+    //           0 -> y : 010
+    //           x coordinate: 011 -> 3 in decimal
+    //           y coordinate: 010 -> 2 in decimal
+    //           full coordinate: (3,2) in cartesian space
+    pub fn from_brgc(
+        iterator: impl Iterator<Item = u32>,
+        length: usize,
+        n: u32,
+        p: u32,
+    ) -> Result<Self, Box<dyn Error>> {
+        if !(n == 2 || n == 3) {
+            return Err(format!(
+                "Cannot generate Hilbert geometry for {n} dimesions. Supported dimensions are 2 and 3"
+            )
+            .into());
+        }
+        let vertices: Vec<(f32, f32, f32)> = iterator
             .take(length)
             .map(|gray_code| {
-                // println!("{gray_code:032b}");
-                let gray_code = format!("{:032b}", gray_code);
-                let x_bin: String = gray_code.chars().step_by(2).collect::<String>();
-                let y_bin: String = gray_code.chars().skip(1).step_by(2).collect::<String>();
+                let gray_code = format!("{:064b}", gray_code);
 
-                let x_dec = u32::from_str_radix(x_bin.to_string().as_ref(), 2).unwrap();
-                let y_dec = u32::from_str_radix(y_bin.to_string().as_ref(), 2).unwrap();
+                match n {
+                    2 => {
+                        // map bits of BRGC to X and Y space
+                        let x_bin: String = gray_code
+                            .chars()
+                            .step_by(2.try_into().unwrap())
+                            .collect::<String>();
+                        let y_bin: String =
+                            gray_code.chars().skip(1).step_by(2).collect::<String>();
 
-                (x_dec as f32, y_dec as f32)
+                        let x_dec = u32::from_str_radix(x_bin.as_ref(), 2).unwrap();
+                        let y_dec = u32::from_str_radix(y_bin.as_ref(), 2).unwrap();
+
+                        (x_dec as f32, y_dec as f32, 0.0)
+                    }
+                    3 => {
+                        // map bits of BRGC to X,Y,Z space
+                        let x_bin: String = gray_code
+                            .chars()
+                            .step_by(3.try_into().unwrap())
+                            .collect::<String>();
+                        let y_bin: String =
+                            gray_code.chars().skip(1).step_by(3).collect::<String>();
+                        let z_bin: String =
+                            gray_code.chars().skip(2).step_by(3).collect::<String>();
+
+                        let x_dec = u32::from_str_radix(x_bin.as_ref(), 2).unwrap();
+                        let y_dec = u32::from_str_radix(y_bin.as_ref(), 2).unwrap();
+                        let z_dec = u32::from_str_radix(z_bin.as_ref(), 2).unwrap();
+
+                        (x_dec as f32, y_dec as f32, z_dec as f32)
+                    }
+                    _ => !unreachable!(),
+                }
             })
             .collect();
 
@@ -33,7 +87,7 @@ impl LinearPath {
             path.push((i, i + 1));
         }
 
-        Self { vertices, path }
+        Ok(Self { vertices, path })
     }
 
     // creates a new linearPath that replaces simple connections with triangle geometry
@@ -51,8 +105,6 @@ impl LinearPath {
             squares.extend(vertices);
             paths.extend(polypaths);
         }
-
-        println!("STATUS: succeeded writing vertices as squares");
 
         // create a rectangle with width 'thickness' / 8 per edge (sequential pair of vertices)
         for i in 0..(self.vertices.len() - 1) {
@@ -153,27 +205,54 @@ impl LinearPath {
     // returns vertices and triangulated poly-paths for a square centered on a vertex
     fn center_square(
         starting_index: usize,
-        center: (f32, f32),
+        center: (f32, f32, f32),
         radius: f32,
     ) -> (Vec<(f32, f32, f32)>, Vec<(usize, usize, usize)>) {
         let mut vertices: Vec<(f32, f32, f32)> = Vec::new();
         let offset = 0.7071 * radius;
-        vertices.push((center.0 - offset, center.1 - offset, 0.0));
-        vertices.push((center.0 + offset, center.1 - offset, 0.0));
-        vertices.push((center.0 - offset, center.1 + offset, 0.0));
-        vertices.push((center.0 + offset, center.1 + offset, 0.0));
+
+        vertices.push((center.0 - offset, center.1 - offset, center.2 + offset));
+        vertices.push((center.0 + offset, center.1 - offset, center.2 + offset));
+        vertices.push((center.0 - offset, center.1 + offset, center.2 + offset));
+        vertices.push((center.0 + offset, center.1 + offset, center.2 + offset));
+
+        vertices.push((center.0 - offset, center.1 - offset, center.2 - offset));
+        vertices.push((center.0 + offset, center.1 - offset, center.2 - offset));
+        vertices.push((center.0 - offset, center.1 + offset, center.2 - offset));
+        vertices.push((center.0 + offset, center.1 + offset, center.2 - offset));
 
         let mut polypaths = Vec::<(usize, usize, usize)>::new();
-        let t1: Vec<usize> = [0, 1, 2]
+        let cube_paths = [
+            [0, 1, 2],
+            [1, 2, 3],
+            [0, 2, 4],
+            [2, 4, 6],
+            [2, 3, 6],
+            [3, 6, 7],
+            [1, 3, 5],
+            [3, 5, 7],
+            [0, 1, 4],
+            [1, 4, 5],
+            [4, 5, 6],
+            [5, 6, 7],
+        ];
+
+        let cube_vertex_index_path = cube_paths
             .iter()
-            .map(|index| index + starting_index)
-            .collect();
-        let t2: Vec<usize> = [1, 2, 3]
-            .iter()
-            .map(|index| index + starting_index)
-            .collect();
-        polypaths.push((t1[0], t1[1], t1[2]));
-        polypaths.push((t2[0], t2[1], t2[2]));
+            .map(|path| {
+                path.iter()
+                    .map(|index| index + starting_index)
+                    .collect::<Vec<usize>>()
+            })
+            .collect::<Vec<Vec<usize>>>();
+
+        cube_vertex_index_path.iter().for_each(|path| {
+            polypaths.push((
+                *path.get(0).unwrap(),
+                *path.get(1).unwrap(),
+                *path.get(2).unwrap(),
+            ));
+        });
 
         (vertices, polypaths)
     }
