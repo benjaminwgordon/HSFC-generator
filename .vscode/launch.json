@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'hilbert-in-cartesian'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=hilbert-in-cartesian",
+                    "--package=hilbert-in-cartesian"
+                ],
+                "filter": {
+                    "name": "hilbert-in-cartesian",
+                    "kind": "bin"
+                }
+            },
+            "args": ["2", "4", "true"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'hilbert-in-cartesian'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=hilbert-in-cartesian",
+                    "--package=hilbert-in-cartesian"
+                ],
+                "filter": {
+                    "name": "hilbert-in-cartesian",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

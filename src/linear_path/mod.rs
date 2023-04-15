@@ -28,8 +28,8 @@ impl LinearPath {
     //           x coordinate: 011 -> 3 in decimal
     //           y coordinate: 010 -> 2 in decimal
     //           full coordinate: (3,2) in cartesian space
-    pub fn from_brgc(
-        iterator: impl Iterator<Item = u32>,
+    pub fn from_brgc_vec(
+        brgc: Vec<u32>,
         length: usize,
         n: u32,
         p: u32,
@@ -40,8 +40,8 @@ impl LinearPath {
             )
             .into());
         }
-        let vertices: Vec<(f32, f32, f32)> = iterator
-            .take(length)
+        let vertices: Vec<(f32, f32, f32)> = brgc
+            .iter()
             .map(|gray_code| {
                 let gray_code = format!("{:064b}", gray_code);
 
@@ -165,14 +165,6 @@ impl LinearPath {
             || midpoint_to_midpoint_vec.normalize() == Vec3::NEG_Y;
 
         if is_horizontal || is_vertical {
-            // let v1_left = v1 + (Vec3::NEG_Y * width) + (Vec3::X * midpoint_to_midpoint_dist);
-            // let v1_right = v1 + (Vec3::Y * width) + (Vec3::X * midpoint_to_midpoint_dist);
-            // let v2_left = v2 + (Vec3::NEG_Y * width) + (Vec3::X * midpoint_to_midpoint_dist);
-            // let v2_right = v2 + (Vec3::Y * width) + (Vec3::X * midpoint_to_midpoint_dist);
-            // for v in [v1_left, v1_right, v2_left, v2_right] {
-            //     vertices.push(v.into());
-            // }
-
             let rotation = midpoint_to_midpoint_vec.angle_between(Vec3::new(0.0, 1.0, 0.0));
 
             // generate 4 points of rectangle edges

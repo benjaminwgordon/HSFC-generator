@@ -1,10 +1,12 @@
 mod brgc;
 mod linear_path;
 mod obj;
+mod skilling_transform;
 use std::{env, error::Error, path::PathBuf};
 
 use brgc::Brgc;
 use linear_path::LinearPath;
+use skilling_transform::skilling_transform;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
@@ -19,15 +21,69 @@ fn main() -> Result<(), Box<dyn Error>> {
     // each side of the constructed rectangle/rectangular prism will have length 2^n
     let p = &args[2].parse::<u32>().unwrap();
 
+    let skilling = &args[3].parse::<bool>().unwrap();
+
     let vertices_per_axis = 2_usize.pow(*p);
     let total_vertices = vertices_per_axis.pow(*n);
 
-    // optionally apply the skilling transform
+    println!("STATUS: generating {total_vertices} vertices of Binary Reflected Gray Code");
+    let brgc_vec: Vec<u32> = brgc.take(total_vertices).collect();
+    println!(
+        "STATUS: succeeded generating {total_vertices} vertices of Binary Reflected Gray Code"
+    );
 
-    // end skilling transform
+    // optionally apply the skilling transform
+    let skilling_transformed = match *skilling {
+        true => {
+            println!("STATUS: Applying the skilling transform to {total_vertices} vertices");
+            println!("{:?}", brgc_vec);
+            let transformed_brgc = skilling_transform(brgc_vec.clone(), *n, *p);
+            println!("Hilbert  -> Skilling -> ( Xbin, Ybin )  -> (X,Y)");
+            println!("- - - - - - - - - - - - - - - - - - - - - - - - ");
+            for i in 0..transformed_brgc.len() {
+                println!(
+                    "{:08b} -> {:08b} -> ({:?},{:?}) -> ({},{})",
+                    brgc_vec[i],
+                    transformed_brgc[i],
+                    format!("{:08b}", transformed_brgc[i])
+                        .chars()
+                        .step_by(2)
+                        .collect::<String>(),
+                    format!("{:08b}", transformed_brgc[i])
+                        .chars()
+                        .skip(1)
+                        .step_by(2)
+                        .collect::<String>(),
+                    u32::from_str_radix(
+                        &format!("{:032b}", transformed_brgc[i])
+                            .chars()
+                            .step_by(2)
+                            .collect::<String>(),
+                        2
+                    )
+                    .unwrap(),
+                    u32::from_str_radix(
+                        &format!("{:032b}", transformed_brgc[i])
+                            .chars()
+                            .skip(1)
+                            .step_by(2)
+                            .collect::<String>(),
+                        2
+                    )
+                    .unwrap()
+                );
+            }
+            println!(
+                "STATUS: succeeded applying the skilling transform to {total_vertices} vertices"
+            );
+            transformed_brgc
+        }
+        false => brgc_vec,
+    };
 
     println!("STATUS: generating {total_vertices} vertices of Binary Reflected Gray Code");
-    let linear_path = LinearPath::from_brgc(brgc, total_vertices, *n, *p).unwrap();
+    let linear_path =
+        LinearPath::from_brgc_vec(skilling_transformed, total_vertices, *n, *p).unwrap();
     println!(
         "STATUS: succeeded generating {total_vertices} vertices of Binary Reflected Gray Code"
     );
