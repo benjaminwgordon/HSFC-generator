@@ -18,16 +18,29 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
     let data_start_index = hilbert_index_bitvec.len() - hilbert_index_bits;
 
     // walk over each meaningful data bit, skipping the first two
-    for r in (data_start_index..(&hilbert_index_bitvec.len() - 2)).rev() {
+    for r in (data_start_index..(&hilbert_index_bitvec.len() - n as usize)).rev() {
         if !hilbert_index_bitvec[r as usize] {
             // swap the lower-order x bits with y-bits
-            // TODO, work out how exchanging works in 3 dimensions (only support 2 dim for now)
-
             let mut i = hilbert_index_bitvec.len() - n as usize;
             let bitvec_len = hilbert_index_bitvec.len();
-            while i > r {
-                hilbert_index_bitvec.swap(i, i + (bitvec_len - r) % n as usize);
-                i -= n as usize;
+            match n {
+                2 => {
+                    // 2 dimensional swap
+                    while i > r {
+                        hilbert_index_bitvec.swap(i, i + (bitvec_len - r) % n as usize);
+                        i -= n as usize;
+                    }
+                }
+                3 => {
+                    // 3 dimensional rotate
+                    while i > r {
+                        hilbert_index_bitvec.swap(i, i + 1);
+                        hilbert_index_bitvec.swap(i + 1, i + 2);
+                        hilbert_index_bitvec.swap(i, i + 2);
+                        i -= n as usize;
+                    }
+                }
+                _ => !unreachable!(),
             }
         } else {
             // flip all lower-order bits of the corresponding dimension (x, y, or z)
@@ -74,13 +87,13 @@ mod tests {
     fn example_4_bit() {
         let input = 0b1101 as u32;
         let expected = 0b1101 as u32;
-        assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2), expected);
+        assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2, 2), expected);
     }
 
     #[test]
     fn example_8_bit() {
         let input = 0b11001101 as u32;
         let expected = 0b11001110 as u32;
-        assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2), expected);
+        assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2, 4), expected);
     }
 }

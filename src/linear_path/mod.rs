@@ -11,9 +11,9 @@ pub struct LinearPath {
 }
 
 impl LinearPath {
-    // given an iterator that generates Binary Reflected Gray Codes, and a target number
-    // of elements to encode, generate a LinearPath representing X,Y,Z coordinates in
-    // a 3d rectangular prism of vertices
+    // given a Vec of u32, generate a LinearPath representing
+    // X,Y,Z coordinates in a 3d rectangular prism of vertices with a single
+    // non-cyclic traversal path
 
     // This can be done by taking every other bit of the BRGC, and assigning it to a
     // binary encoded whole number representing one coordinate in space
@@ -111,8 +111,8 @@ impl LinearPath {
             let v1 = self.vertices.get(i).unwrap();
             let v2 = self.vertices.get(i + 1).unwrap();
             let (vertices, polypaths) = Self::midpoint_to_midpoint_rect(
-                (v1.0, v1.1, 0.0),
-                (v2.0, v2.1, 0.0),
+                (v1.0, v1.1, v1.2),
+                (v2.0, v2.1, v2.2),
                 thickness / 8.0,
                 squares.len() + rectangles.len(),
             )
@@ -154,17 +154,18 @@ impl LinearPath {
         let midpoint_to_midpoint_vec = v2 - v1;
         let midpoint_to_midpoint_dist = midpoint_to_midpoint_vec.length();
 
-        // println!(
-        //     "STATUS: new path: v2-v1:\n     v1: {}\n     v2: {}\n     v2-v1: {}",
-        //     v1, v2, midpoint_to_midpoint_vec
-        // );
+        if midpoint_to_midpoint_dist.abs() != 1.0 {
+            return Err(format!("v1-v2 distance is not 1 v2:{v2} v1:{v1} v2-v1{}", v2 - v1).into());
+        }
 
         let is_horizontal = midpoint_to_midpoint_vec.normalize() == Vec3::X
-            || midpoint_to_midpoint_vec.normalize() == Vec3::Y;
-        let is_vertical = midpoint_to_midpoint_vec.normalize() == Vec3::NEG_X
+            || midpoint_to_midpoint_vec.normalize() == Vec3::NEG_X;
+        let is_vertical = midpoint_to_midpoint_vec.normalize() == Vec3::Y
             || midpoint_to_midpoint_vec.normalize() == Vec3::NEG_Y;
+        let is_inward = midpoint_to_midpoint_vec.normalize() == Vec3::Z
+            || midpoint_to_midpoint_vec.normalize() == Vec3::NEG_Z;
 
-        if is_horizontal || is_vertical {
+        if is_horizontal || is_vertical || is_inward {
             let rotation = midpoint_to_midpoint_vec.angle_between(Vec3::new(0.0, 1.0, 0.0));
 
             // generate 4 points of rectangle edges
