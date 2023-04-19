@@ -36,7 +36,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let skilling_transformed = match *skilling {
         true => {
             println!("STATUS: Applying the skilling transform to {total_vertices} vertices");
-            println!("{:?}", brgc_vec);
             let transformed_brgc = skilling_transform(brgc_vec.clone(), *n, *p);
             match n {
                 2 => print_skilling_transform_vertices_2d(&brgc_vec, &transformed_brgc),
@@ -110,23 +109,23 @@ fn print_skilling_transform_vertices_2d(brgc_vec: &Vec<u32>, transformed_brgc: &
 }
 
 fn print_skilling_transform_vertices_3d(brgc_vec: &Vec<u32>, transformed_brgc: &Vec<u32>) {
-    println!("  BRGC   -> Skilling -> (Xbin,Ybin, Zbin)  -> (X,Y,Z)");
+    println!("  BRGC   -> Skilling -> (    Xbin     ,    Ybin     ,    Zbin    ) -> (X,Y,Z)");
     println!("- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
     for i in 0..transformed_brgc.len() {
         println!(
             "{:08b} -> {:08b} -> ({:?},{:?},{:?}) -> ({},{},{})",
             brgc_vec[i],
             transformed_brgc[i],
-            format!("{:08b}", transformed_brgc[i])
+            format!("{:032b}", transformed_brgc[i])
                 .chars()
                 .step_by(3)
                 .collect::<String>(),
-            format!("{:08b}", transformed_brgc[i])
+            format!("{:032b}", transformed_brgc[i])
                 .chars()
                 .skip(1)
                 .step_by(3)
                 .collect::<String>(),
-            format!("{:08b}", transformed_brgc[i])
+            format!("{:032b}", transformed_brgc[i])
                 .chars()
                 .skip(2)
                 .step_by(3)

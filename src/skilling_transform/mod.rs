@@ -9,16 +9,10 @@ pub fn skilling_transform(brgc: Vec<u32>, n: u32, p: u32) -> Vec<u32> {
 }
 
 fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> u32 {
-    let mut hilbert_index_bitvec = into_bit_vec(*hilbert_index, 32);
+    let mut hilbert_index_bitvec = into_bit_vec(*hilbert_index, (n * p) as usize);
 
-    // there will be leading 0's in the bitvec, so calculate how many valid
-    // data bits exist
-    let hilbert_index_bits: usize = (p * n) as usize;
-
-    let data_start_index = hilbert_index_bitvec.len() - hilbert_index_bits;
-
-    // walk over each meaningful data bit, skipping the first two
-    for r in (data_start_index..(&hilbert_index_bitvec.len() - n as usize)).rev() {
+    // walk over each data bit, skipping the first two
+    for r in (0..(&hilbert_index_bitvec.len() - n as usize)).rev() {
         if !hilbert_index_bitvec[r as usize] {
             // swap the lower-order x bits with y-bits
             let mut i = hilbert_index_bitvec.len() - n as usize;
@@ -34,9 +28,8 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
                 3 => {
                     // 3 dimensional rotate
                     while i > r {
-                        hilbert_index_bitvec.swap(i, i + 1);
-                        hilbert_index_bitvec.swap(i + 1, i + 2);
                         hilbert_index_bitvec.swap(i, i + 2);
+                        hilbert_index_bitvec.swap(i, i + 1);
                         i -= n as usize;
                     }
                 }
@@ -44,14 +37,14 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
             }
         } else {
             // flip all lower-order bits of the corresponding dimension (x, y, or z)
-            let mut i = hilbert_index_bitvec.len() - n as usize;
-            while i > r {
+            let length = hilbert_index_bitvec.len();
+            let mut i = length - 4 + n as usize;
+            while i > r && i > n as usize {
                 let temp = hilbert_index_bitvec[i];
                 let _ = std::mem::replace(&mut hilbert_index_bitvec[i], !temp);
                 i -= n as usize;
             }
         }
-        //println!("{:b}", into_u32(hilbert_index_bitvec.clone()));
     }
     into_u32(hilbert_index_bitvec)
 }
@@ -79,9 +72,103 @@ fn into_u32(bitvec: Vec<bool>) -> u32 {
     u32::from_str_radix(&bitstring, 2).unwrap()
 }
 
+fn into_xyz_binary_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
+    let binary_hilbert_encoded_coordinates = format!("{:b}", hilbert_coordinates);
+    // insert any necessary leading zeros so that the string is N * P characters
+    // this is necessary to ensure each bit is correctly
+    //      assigned to its x,y, or z axis
+    let mut padding = String::new();
+    while binary_hilbert_encoded_coordinates.len() + padding.len() < (n * p) as usize {
+        padding.push_str("0");
+    }
+    padding.push_str(&binary_hilbert_encoded_coordinates);
+    let padded_hilbert_coordinate_string = padding;
+    println!("{padded_hilbert_coordinate_string}");
+    // take every nth character and assign it to its axis
+    // two axis decoding, only x and y coordinates
+    let x = padded_hilbert_coordinate_string
+        .chars()
+        .step_by(2)
+        .collect::<String>()
+        .parse::<u32>()
+        .unwrap();
+    let y = padded_hilbert_coordinate_string
+        .chars()
+        .skip(1)
+        .step_by(2)
+        .collect::<String>()
+        .parse::<u32>()
+        .unwrap();
+    let z = padded_hilbert_coordinate_string
+        .chars()
+        .skip(2)
+        .step_by(2)
+        .collect::<String>()
+        .parse::<u32>()
+        .unwrap();
+    (x, y)
+}
+
+fn into_xyz_binary_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
+    let binary_hilbert_encoded_coordinates = format!("{:b}", hilbert_coordinates);
+    println!("{binary_hilbert_encoded_coordinates}");
+    // insert any necessary leading zeros so that the string is N * P characters
+    // this is necessary to ensure each bit is correctly
+    //      assigned to its x,y, or z axis
+    let mut padding = String::new();
+    while binary_hilbert_encoded_coordinates.len() + padding.len() < (n * p) as usize {
+        padding.push_str("0");
+    }
+    padding.push_str(&binary_hilbert_encoded_coordinates);
+    let padded_hilbert_coordinate_string = padding;
+    // take every nth character and assign it to its axis
+    // two axis decoding, only x and y coordinates
+
+    let x = padded_hilbert_coordinate_string
+        .chars()
+        .step_by(3)
+        .collect::<String>()
+        .parse::<u32>()
+        .unwrap();
+    let y = padded_hilbert_coordinate_string
+        .chars()
+        .skip(1)
+        .step_by(3)
+        .collect::<String>()
+        .parse::<u32>()
+        .unwrap();
+    let z = padded_hilbert_coordinate_string
+        .chars()
+        .skip(2)
+        .step_by(3)
+        .collect::<String>()
+        .parse::<u32>()
+        .unwrap();
+    (x, y, z)
+}
+
+fn into_xyz_decimal_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
+    let (x_bin, y_bin) = into_xyz_binary_2d(hilbert_coordinates, n, p);
+    println!("x_bin: {x_bin}, y_bin: {y_bin}");
+    let x_dec = u32::from_str_radix(&x_bin.to_string(), 2).unwrap();
+    let y_dec = u32::from_str_radix(&y_bin.to_string(), 2).unwrap();
+    (x_dec, y_dec)
+}
+
+fn into_xyz_decimal_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
+    let (x_bin, y_bin, z_bin) = into_xyz_binary_3d(hilbert_coordinates, n, p);
+    let x_dec = u32::from_str_radix(&x_bin.to_string(), 2).unwrap();
+    let y_dec = u32::from_str_radix(&y_bin.to_string(), 2).unwrap();
+    let z_dec = u32::from_str_radix(&z_bin.to_string(), 2).unwrap();
+    (x_dec, y_dec, z_dec)
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::skilling_transform::hilbert_index_to_hilbert_coordinates;
+    use crate::skilling_transform::{
+        hilbert_index_to_hilbert_coordinates, into_xyz_binary_2d, into_xyz_binary_3d,
+        into_xyz_decimal_2d, into_xyz_decimal_3d,
+    };
 
     #[test]
     fn example_4_bit() {
@@ -95,5 +182,41 @@ mod tests {
         let input = 0b11001101 as u32;
         let expected = 0b11001110 as u32;
         assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2, 4), expected);
+    }
+
+    #[test]
+    fn decode_hilbert_coordinate_to_xyz_binary_2d() {
+        let n = 2;
+        let p = 4;
+        let hilbert_coordinate = 0b11000101 as u32;
+        let expected = (1000, 1011);
+        assert_eq!(into_xyz_binary_2d(hilbert_coordinate, n, p), expected);
+    }
+
+    #[test]
+    fn decode_hilbert_coordinate_to_xyz_binary_3d() {
+        let n = 3;
+        let p = 3;
+        let hilbert_coordinate = 0b101110100 as u32;
+        let expected = (111, 010, 100);
+        assert_eq!(into_xyz_binary_3d(hilbert_coordinate, n, p), expected);
+    }
+
+    #[test]
+    fn decode_hilbert_coordinate_to_xyz_decimal_2d() {
+        let n = 2;
+        let p = 3;
+        let hilbert_coordinate = 0b11000101 as u32;
+        let expected = (8, 11);
+        assert_eq!(into_xyz_decimal_2d(hilbert_coordinate, n, p), expected);
+    }
+
+    #[test]
+    fn decode_hilbert_coordinate_to_xyz_decimal_3d() {
+        let n = 3;
+        let p = 3;
+        let hilbert_coordinate = 0b101110100 as u32;
+        let expected = (7, 2, 4);
+        assert_eq!(into_xyz_decimal_3d(hilbert_coordinate, n, p), expected);
     }
 }
