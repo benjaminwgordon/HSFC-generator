@@ -99,7 +99,7 @@ fn print_skilling_transform_vertices_3d(
     println!("- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
     for i in 0..transformed_brgc.len() {
         println!(
-            "{:08b} -> {:08b} -> {:?} -> {:?}",
+            "{:09b} -> {:09b} -> {:?} -> {:?}",
             brgc_vec[i],
             transformed_brgc[i],
             skilling_transform::into_xyz_binary_3d(transformed_brgc[i], n, p),

@@ -29,7 +29,7 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
                     // 3 dimensional rotate
                     while i > r {
                         hilbert_index_bitvec.swap(i, i + 2);
-                        hilbert_index_bitvec.swap(i, i + 1);
+                        hilbert_index_bitvec.swap(i + 1, i + 2);
                         i -= n as usize;
                     }
                 }
@@ -37,8 +37,7 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
             }
         } else {
             // flip all lower-order bits of the corresponding dimension (x, y, or z)
-            let length = hilbert_index_bitvec.len();
-            let mut i = length - 4 + n as usize;
+            let mut i = n as usize * p as usize - n as usize;
             while i > r && i >= n as usize {
                 let temp = hilbert_index_bitvec[i];
                 let _ = std::mem::replace(&mut hilbert_index_bitvec[i], !temp);
@@ -191,6 +190,14 @@ mod tests {
         let input = 0b01100000 as u32;
         let expected = 0b01000000 as u32;
         assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2, 4), expected);
+    }
+
+    // regression test for case that caused failures for unknown reasons
+    #[test]
+    pub fn test_unknown() {
+        let input = 0b000101000 as u32;
+        let expected = 0b000101110 as u32;
+        assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 3, 3), expected);
     }
 
     #[test]
