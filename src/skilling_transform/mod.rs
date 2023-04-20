@@ -72,7 +72,7 @@ fn into_u32(bitvec: Vec<bool>) -> u32 {
     u32::from_str_radix(&bitstring, 2).unwrap()
 }
 
-fn into_xyz_binary_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
+pub fn into_xyz_binary_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
     let binary_hilbert_encoded_coordinates = format!("{:b}", hilbert_coordinates);
     // insert any necessary leading zeros so that the string is N * P characters
     // this is necessary to ensure each bit is correctly
@@ -83,7 +83,6 @@ fn into_xyz_binary_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
     }
     padding.push_str(&binary_hilbert_encoded_coordinates);
     let padded_hilbert_coordinate_string = padding;
-    println!("{padded_hilbert_coordinate_string}");
     // take every nth character and assign it to its axis
     // two axis decoding, only x and y coordinates
     let x = padded_hilbert_coordinate_string
@@ -109,7 +108,7 @@ fn into_xyz_binary_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
     (x, y)
 }
 
-fn into_xyz_binary_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
+pub fn into_xyz_binary_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
     let binary_hilbert_encoded_coordinates = format!("{:b}", hilbert_coordinates);
     println!("{binary_hilbert_encoded_coordinates}");
     // insert any necessary leading zeros so that the string is N * P characters
@@ -147,15 +146,14 @@ fn into_xyz_binary_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u3
     (x, y, z)
 }
 
-fn into_xyz_decimal_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
+pub fn into_xyz_decimal_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
     let (x_bin, y_bin) = into_xyz_binary_2d(hilbert_coordinates, n, p);
-    println!("x_bin: {x_bin}, y_bin: {y_bin}");
     let x_dec = u32::from_str_radix(&x_bin.to_string(), 2).unwrap();
     let y_dec = u32::from_str_radix(&y_bin.to_string(), 2).unwrap();
     (x_dec, y_dec)
 }
 
-fn into_xyz_decimal_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
+pub fn into_xyz_decimal_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
     let (x_bin, y_bin, z_bin) = into_xyz_binary_3d(hilbert_coordinates, n, p);
     let x_dec = u32::from_str_radix(&x_bin.to_string(), 2).unwrap();
     let y_dec = u32::from_str_radix(&y_bin.to_string(), 2).unwrap();
