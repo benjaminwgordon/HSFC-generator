@@ -97,13 +97,6 @@ pub fn into_xyz_binary_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32
         .collect::<String>()
         .parse::<u32>()
         .unwrap();
-    let z = padded_hilbert_coordinate_string
-        .chars()
-        .skip(2)
-        .step_by(2)
-        .collect::<String>()
-        .parse::<u32>()
-        .unwrap();
     (x, y)
 }
 

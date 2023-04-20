@@ -2,7 +2,10 @@ use std::error::Error;
 
 use glam::{Quat, Vec3};
 
-use crate::obj::Obj;
+use crate::{
+    obj::Obj,
+    skilling_transform::{into_xyz_decimal_2d, into_xyz_decimal_3d},
+};
 
 #[derive(Debug)]
 pub struct LinearPath {
@@ -42,42 +45,17 @@ impl LinearPath {
         }
         let vertices: Vec<(f32, f32, f32)> = brgc
             .iter()
-            .map(|gray_code| {
-                let gray_code = format!("{:064b}", gray_code);
-
-                match n {
-                    2 => {
-                        // map bits of BRGC to X and Y space
-                        let x_bin: String = gray_code
-                            .chars()
-                            .step_by(2.try_into().unwrap())
-                            .collect::<String>();
-                        let y_bin: String =
-                            gray_code.chars().skip(1).step_by(2).collect::<String>();
-
-                        let x_dec = u32::from_str_radix(x_bin.as_ref(), 2).unwrap();
-                        let y_dec = u32::from_str_radix(y_bin.as_ref(), 2).unwrap();
-
-                        (x_dec as f32, y_dec as f32, 0.0)
-                    }
-                    3 => {
-                        // map bits of BRGC to X,Y,Z space
-                        let x_bin: String = gray_code
-                            .chars()
-                            .step_by(3.try_into().unwrap())
-                            .collect::<String>();
-                        let y_bin: String =
-                            gray_code.chars().skip(1).step_by(3).collect::<String>();
-                        let z_bin: String =
-                            gray_code.chars().skip(2).step_by(3).collect::<String>();
-
-                        let x_dec = u32::from_str_radix(x_bin.as_ref(), 2).unwrap();
-                        let y_dec = u32::from_str_radix(y_bin.as_ref(), 2).unwrap();
-                        let z_dec = u32::from_str_radix(z_bin.as_ref(), 2).unwrap();
-
-                        (x_dec as f32, y_dec as f32, z_dec as f32)
-                    }
-                    _ => !unreachable!(),
+            .map(|gray_code| match n {
+                2 => {
+                    let (x, y) = into_xyz_decimal_2d(*gray_code, n, p);
+                    (x as f32, y as f32, 0.0)
+                }
+                3 => {
+                    let (x, y, z) = into_xyz_decimal_3d(*gray_code, n, p);
+                    (x as f32, y as f32, z as f32)
+                }
+                _ => {
+                    unreachable!()
                 }
             })
             .collect();
