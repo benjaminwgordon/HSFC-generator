@@ -34,6 +34,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // optionally apply the skilling transform
     let skilling_transformed = match *skilling {
+        false => brgc_vec,
         true => {
             println!("STATUS: Applying the skilling transform to {total_vertices} vertices");
             let transformed_brgc = skilling_transform(brgc_vec.clone(), *n, *p);
@@ -47,7 +48,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             );
             transformed_brgc
         }
-        false => brgc_vec,
     };
 
     println!("STATUS: generating {total_vertices} vertices of Binary Reflected Gray Code");
