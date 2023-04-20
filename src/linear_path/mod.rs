@@ -217,17 +217,17 @@ impl LinearPath {
         let mut polypaths = Vec::<(usize, usize, usize)>::new();
         let cube_paths = [
             [0, 1, 2],
-            [1, 2, 3],
+            [3, 2, 1],
             [0, 2, 4],
-            [2, 4, 6],
+            [6, 4, 2],
             [2, 3, 6],
-            [3, 6, 7],
+            [7, 6, 3],
             [1, 3, 5],
-            [3, 5, 7],
+            [7, 5, 3],
             [0, 1, 4],
-            [1, 4, 5],
+            [5, 4, 1],
             [4, 5, 6],
-            [5, 6, 7],
+            [7, 6, 5],
         ];
 
         let cube_vertex_index_path = cube_paths

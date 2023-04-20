@@ -39,7 +39,7 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
             // flip all lower-order bits of the corresponding dimension (x, y, or z)
             let length = hilbert_index_bitvec.len();
             let mut i = length - 4 + n as usize;
-            while i > r && i > n as usize {
+            while i > r && i >= n as usize {
                 let temp = hilbert_index_bitvec[i];
                 let _ = std::mem::replace(&mut hilbert_index_bitvec[i], !temp);
                 i -= n as usize;
@@ -179,6 +179,17 @@ mod tests {
     fn example_8_bit() {
         let input = 0b11001101 as u32;
         let expected = 0b11001110 as u32;
+        assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2, 4), expected);
+    }
+
+    /*
+     * binary numbers that have leading 0's when represented with (n*p) bits
+     * are a potential failure case
+     */
+    #[test]
+    fn example_leading_zeros() {
+        let input = 0b01100000 as u32;
+        let expected = 0b01000000 as u32;
         assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 2, 4), expected);
     }
 
