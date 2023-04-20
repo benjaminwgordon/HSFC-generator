@@ -14,26 +14,14 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
     // walk over each data bit, skipping the first two
     for r in (0..(&hilbert_index_bitvec.len() - n as usize)).rev() {
         if !hilbert_index_bitvec[r as usize] {
-            // swap the lower-order x bits with y-bits
-            let mut i = hilbert_index_bitvec.len() - n as usize;
-            let bitvec_len = hilbert_index_bitvec.len();
-            match n {
-                2 => {
-                    // 2 dimensional swap
-                    while i > r {
-                        hilbert_index_bitvec.swap(i, i + (bitvec_len - r) % n as usize);
-                        i -= n as usize;
-                    }
-                }
-                3 => {
-                    // 3 dimensional rotate
-                    while i > r {
-                        hilbert_index_bitvec.swap(i, i + 2);
-                        hilbert_index_bitvec.swap(i + 1, i + 2);
-                        i -= n as usize;
-                    }
-                }
-                _ => !unreachable!(),
+            // swap the lower-order x bits with x,y, or z bits depending on current r
+            let offset = r % n as usize;
+            let mut s = (p * n - n) as usize + offset;
+            let mut q = (p * n - n) as usize;
+            while q > r {
+                hilbert_index_bitvec.swap(q, s);
+                q -= n as usize;
+                s -= n as usize;
             }
         } else {
             // flip all lower-order bits of the corresponding dimension (x, y, or z)
@@ -189,7 +177,7 @@ mod tests {
     #[test]
     pub fn test_unknown() {
         let input = 0b000101000 as u32;
-        let expected = 0b000101110 as u32;
+        let expected = 0b000011101 as u32;
         assert_eq!(hilbert_index_to_hilbert_coordinates(&input, 3, 3), expected);
     }
 
