@@ -21,7 +21,7 @@ This module contains functionality for generating OBJ files from the cartesian c
 
 These are useful for visualizing the output of the Hilbert Curve generator, and can be readily rendered by uploading to an online OBJ file renderer.
 
-### Examples:
+## Examples:
 
 n2, p2
 ![n2 p2 hilbert cube](./readme_images/n2p2.png)
