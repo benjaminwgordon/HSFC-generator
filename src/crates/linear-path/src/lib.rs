@@ -1,16 +1,12 @@
+use glam::{Quat, Vec3};
+use obj;
 use std::error::Error;
 
-use glam::{Quat, Vec3};
-
-use crate::{
-    obj::Obj,
-    skilling_transform::{into_xyz_decimal_2d, into_xyz_decimal_3d},
-};
+use crate::obj::Obj;
 
 #[derive(Debug)]
 pub struct LinearPath {
     vertices: Vec<(u32, u32, u32)>,
-    path: Vec<(usize, usize)>,
 }
 
 impl LinearPath {
@@ -48,7 +44,7 @@ impl LinearPath {
             path.push((i, i + 1));
         }
 
-        Ok(Self { vertices, path })
+        Ok(Self { vertices })
     }
 
     // creates a new linearPath that replaces simple connections with triangle geometry

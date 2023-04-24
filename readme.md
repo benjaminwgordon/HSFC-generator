@@ -1,39 +1,22 @@
 # HSFC-Generator
 
-A WIP Hilbert Space-Filling Curve generator and renderer
+A WIP Hilbert Space-Filling Curve generator with a built-in OBJ generator for rendering the curves
 
-## Modules:
+Intended for use as a library, but contains a main.rs file with example usage.
 
-### BRGC
+## Submodules:
 
-Brgc is the Binary Reflected Gray Code Iterator Implementation
-This project generates the cartesian coordinates of each vertex in the
-HSFC using a technique that begins with a list of the first n binary
-numbers counted using the Binary Reflected Gray Code counting system.
+### Hilbert-Curve
 
-The iterator exposed by this module can be used to generate
-points in a BRGC of any magnitude, although for the typical purposes
-of generating square hilbert curves and cubic hilbert cubes, the number
-of generated points will typically be p^n, where n is the number of dimensions
-for the resulting cartesian coordinates (2D and 3D currently supported), and p
-is the number of data bits for each coordinate (each side of your square/cube
-will have 2^p vertices)
+This module contains functionality for generating the Cartesian coordinates of the vertices in a Hilbert Space-Filling Curve in both 2D and 3D.
 
-## Skilling_Transform
+It also contains utility functions for converting the output vertices into different formats:
 
-This module contains functions for applying the Skilling Transform to an existing
-Vector of BRGC u32's, and manipulating the output format for various uses.
-
-I've optimized for readability and ease of understanding in the code,
-since the algorithm is not immediately clear. There was a good deal of trial
-and error in implementing this algorithm. If I spend more time on this project,
-I'll try replacing all the string manipulation with bit manipulation and benchmark
-the speed difference.
+- (x,y,z) in binary
+- (x,y,z) in decimal
 
 ### Linear_Path
 
-This represents a list of cartesian coordinates that are traversed linearly.
+This module contains functionality for generating OBJ files from the cartesian coordinates of a Hilbert Curve.
 
-It contains methods for exporting the linear path data to CSV and OBJ for
-visualization. During development, I used this module for evaluating the success
-of my Skilling Transform implementation.
+These are useful for visualizing the output of the Hilbert Curve generator, and can be readily rendered by uploading to an online OBJ file renderer.
