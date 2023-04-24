@@ -14,24 +14,26 @@ numbers counted using the Binary Reflected Gray Code counting system.
 The iterator exposed by this module can be used to generate
 points in a BRGC of any magnitude, although for the typical purposes
 of generating square hilbert curves and cubic hilbert cubes, the number
-of generated points will typically be n^2, where n is a non-negative integer.
+of generated points will typically be p^n, where n is the number of dimensions
+for the resulting cartesian coordinates (2D and 3D currently supported), and p
+is the number of data bits for each coordinate (each side of your square/cube
+will have 2^p vertices)
 
-The algorithm used to calculate these points may not be optimal,
-and I intend to return to this in the future if BRGC generation
-becomes the performance bottleneck of hilbert curve generation.
+## Skilling_Transform
+
+This module contains functions for applying the Skilling Transform to an existing
+Vector of BRGC u32's, and manipulating the output format for various uses.
+
+I've optimized for readability and ease of understanding in the code,
+since the algorithm is not immediately clear. There was a good deal of trial
+and error in implementing this algorithm. If I spend more time on this project,
+I'll try replacing all the string manipulation with bit manipulation and benchmark
+the speed difference.
 
 ### Linear_Path
 
-This represents a list of cartesian coordinates and a traversal path
+This represents a list of cartesian coordinates that are traversed linearly.
 
-For all reasonable cases, the traversal path will just be the set of
-the first n sequential non-negative integer pairs, e.g. [(0,1), (1,2),
-(2,3), (...), (n-2, n-1)]. Due to this, I may remove the path field
-from this struct in the future.
-
-This module has a method for constructing a Linear_Path from an iterator
-of u32 items, and other data types for the linear path could be introduced
-in the future.
-
-It also contains methods for exporting the linear path data to CSV and OBJ for
-visualization.
+It contains methods for exporting the linear path data to CSV and OBJ for
+visualization. During development, I used this module for evaluating the success
+of my Skilling Transform implementation.

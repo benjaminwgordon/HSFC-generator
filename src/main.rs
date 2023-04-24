@@ -1,12 +1,13 @@
 mod brgc;
+mod hilbert_curve;
 mod linear_path;
 mod obj;
 mod skilling_transform;
 use std::{env, error::Error, path::PathBuf};
 
 use brgc::Brgc;
+use hilbert_curve::HilbertCurve;
 use linear_path::LinearPath;
-use skilling_transform::skilling_transform;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
@@ -20,42 +21,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     // let p be the number of bits to assign to each dimension
     // each side of the constructed rectangle/rectangular prism will have length 2^n
     let p = &args[2].parse::<u32>().unwrap();
-
     let skilling = &args[3].parse::<bool>().unwrap();
+    let debug = &args[4].parse::<bool>().unwrap();
 
     let vertices_per_axis = 2_usize.pow(*p);
     let total_vertices = vertices_per_axis.pow(*n);
 
-    println!("STATUS: generating {total_vertices} vertices of Binary Reflected Gray Code");
-    let brgc_vec: Vec<u32> = brgc.take(total_vertices).collect();
-    println!(
-        "STATUS: succeeded generating {total_vertices} vertices of Binary Reflected Gray Code"
-    );
-
     // optionally apply the skilling transform
-    let skilling_transformed = match *skilling {
-        false => brgc_vec,
-        true => {
-            println!("STATUS: Applying the skilling transform to {total_vertices} vertices");
-            let transformed_brgc = skilling_transform(brgc_vec.clone(), *n, *p);
-            match n {
-                2 => print_skilling_transform_vertices_2d(&brgc_vec, &transformed_brgc, *n, *p),
-                3 => print_skilling_transform_vertices_3d(&brgc_vec, &transformed_brgc, *n, *p),
-                _ => {}
-            }
-            println!(
-                "STATUS: succeeded applying the skilling transform to {total_vertices} vertices"
-            );
-            transformed_brgc
-        }
-    };
-
-    println!("STATUS: generating {total_vertices} vertices of Binary Reflected Gray Code");
-    let linear_path =
-        LinearPath::from_brgc_vec(skilling_transformed, total_vertices, *n, *p).unwrap();
-    println!(
-        "STATUS: succeeded generating {total_vertices} vertices of Binary Reflected Gray Code"
-    );
+    let hilbert_curve = HilbertCurve::new(*n, *p).unwrap();
+    let linear_path = LinearPath::from_vec(hilbert_curve.coordinates, *n, *p).unwrap();
 
     println!("STATUS: generating geometry data for render of {total_vertices} vertices");
     let pipes_and_boxes = linear_path.to_2d_edges_and_vertices_obj(0.25);

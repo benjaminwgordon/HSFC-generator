@@ -90,7 +90,6 @@ pub fn into_xyz_binary_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32
 
 pub fn into_xyz_binary_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
     let binary_hilbert_encoded_coordinates = format!("{:b}", hilbert_coordinates);
-    println!("{binary_hilbert_encoded_coordinates}");
     // insert any necessary leading zeros so that the string is N * P characters
     // this is necessary to ensure each bit is correctly
     //      assigned to its x,y, or z axis
@@ -126,11 +125,11 @@ pub fn into_xyz_binary_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32
     (x, y, z)
 }
 
-pub fn into_xyz_decimal_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32) {
+pub fn into_xyz_decimal_2d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
     let (x_bin, y_bin) = into_xyz_binary_2d(hilbert_coordinates, n, p);
     let x_dec = u32::from_str_radix(&x_bin.to_string(), 2).unwrap();
     let y_dec = u32::from_str_radix(&y_bin.to_string(), 2).unwrap();
-    (x_dec, y_dec)
+    (x_dec, y_dec, 0)
 }
 
 pub fn into_xyz_decimal_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32, u32) {
@@ -204,7 +203,7 @@ mod tests {
         let n = 2;
         let p = 3;
         let hilbert_coordinate = 0b11000101 as u32;
-        let expected = (8, 11);
+        let expected = (8, 11, 0);
         assert_eq!(into_xyz_decimal_2d(hilbert_coordinate, n, p), expected);
     }
 

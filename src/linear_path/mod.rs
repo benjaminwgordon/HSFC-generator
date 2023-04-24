@@ -9,7 +9,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct LinearPath {
-    vertices: Vec<(f32, f32, f32)>,
+    vertices: Vec<(u32, u32, u32)>,
     path: Vec<(usize, usize)>,
 }
 
@@ -31,9 +31,8 @@ impl LinearPath {
     //           x coordinate: 011 -> 3 in decimal
     //           y coordinate: 010 -> 2 in decimal
     //           full coordinate: (3,2) in cartesian space
-    pub fn from_brgc_vec(
-        brgc: Vec<u32>,
-        length: usize,
+    pub fn from_vec(
+        vertices: Vec<(u32, u32, u32)>,
         n: u32,
         p: u32,
     ) -> Result<Self, Box<dyn Error>> {
@@ -43,22 +42,6 @@ impl LinearPath {
             )
             .into());
         }
-        let vertices: Vec<(f32, f32, f32)> = brgc
-            .iter()
-            .map(|gray_code| match n {
-                2 => {
-                    let (x, y) = into_xyz_decimal_2d(*gray_code, n, p);
-                    (x as f32, y as f32, 0.0)
-                }
-                3 => {
-                    let (x, y, z) = into_xyz_decimal_3d(*gray_code, n, p);
-                    (x as f32, y as f32, z as f32)
-                }
-                _ => {
-                    unreachable!()
-                }
-            })
-            .collect();
 
         let mut path = Vec::new();
         for i in 0..(vertices.len() - 1) {
@@ -76,21 +59,21 @@ impl LinearPath {
         let mut rectangles = Vec::<(f32, f32, f32)>::new(); // represent edge coordinates
         let mut paths = Vec::<(usize, usize, usize)>::new(); // draw path between vertices
 
-        // create a square with radius 'thickness' / 4 per vertex
-        for vertex in &self.vertices {
-            let (vertices, polypaths) =
-                LinearPath::center_square(squares.len(), *vertex, thickness / 2.0);
-            squares.extend(vertices);
-            paths.extend(polypaths);
-        }
+        // // create a square with radius 'thickness' / 4 per vertex
+        // for vertex in &self.vertices {
+        //     let (vertices, polypaths) =
+        //         LinearPath::center_square(squares.len(), *vertex, thickness / 2.0);
+        //     squares.extend(vertices);
+        //     paths.extend(polypaths);
+        // }
 
         // create a rectangle with width 'thickness' / 8 per edge (sequential pair of vertices)
         for i in 0..(self.vertices.len() - 1) {
             let v1 = self.vertices.get(i).unwrap();
             let v2 = self.vertices.get(i + 1).unwrap();
             let (vertices, polypaths) = Self::midpoint_to_midpoint_rect(
-                (v1.0, v1.1, v1.2),
-                (v2.0, v2.1, v2.2),
+                (v1.0 as f32, v1.1 as f32, v1.2 as f32),
+                (v2.0 as f32, v2.1 as f32, v2.2 as f32),
                 thickness / 8.0,
                 squares.len() + rectangles.len(),
             )
