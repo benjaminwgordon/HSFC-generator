@@ -4,9 +4,9 @@ A WIP Hilbert Space-Filling Curve generator with a built-in OBJ generator for re
 
 Intended for use as a library, but contains a main.rs file with example usage.
 
-## Submodules:
+## Project Structure:
 
-### Hilbert-Curve
+### [Hilbert-Curve](./src/crates/hilbert-curve/README.md)
 
 This module contains functionality for generating the Cartesian coordinates of the vertices in a Hilbert Space-Filling Curve in both 2D and 3D.
 
@@ -15,7 +15,7 @@ It also contains utility functions for converting the output vertices into diffe
 - (x,y,z) in binary
 - (x,y,z) in decimal
 
-### Linear_Path
+### [Linear_Path](./src/crates/linear-path/README.md)
 
 This module contains functionality for generating OBJ files from the cartesian coordinates of a Hilbert Curve.
 

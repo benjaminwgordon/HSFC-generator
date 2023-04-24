@@ -27,11 +27,7 @@ impl LinearPath {
     //           x coordinate: 011 -> 3 in decimal
     //           y coordinate: 010 -> 2 in decimal
     //           full coordinate: (3,2) in cartesian space
-    pub fn from_vec(
-        vertices: Vec<(u32, u32, u32)>,
-        n: u32,
-        p: u32,
-    ) -> Result<Self, Box<dyn Error>> {
+    pub fn from_vec(vertices: Vec<(u32, u32, u32)>, n: u32) -> Result<Self, Box<dyn Error>> {
         if !(n == 2 || n == 3) {
             return Err(format!(
                 "Cannot generate Hilbert geometry for {n} dimesions. Supported dimensions are 2 and 3"
@@ -150,60 +146,5 @@ impl LinearPath {
         }
 
         Ok((vertices, path))
-    }
-
-    // returns vertices and triangulated poly-paths for a square centered on a vertex
-    fn center_square(
-        starting_index: usize,
-        center: (f32, f32, f32),
-        radius: f32,
-    ) -> (Vec<(f32, f32, f32)>, Vec<(usize, usize, usize)>) {
-        let mut vertices: Vec<(f32, f32, f32)> = Vec::new();
-        let offset = 0.7071 * radius;
-
-        vertices.push((center.0 - offset, center.1 - offset, center.2 + offset));
-        vertices.push((center.0 + offset, center.1 - offset, center.2 + offset));
-        vertices.push((center.0 - offset, center.1 + offset, center.2 + offset));
-        vertices.push((center.0 + offset, center.1 + offset, center.2 + offset));
-
-        vertices.push((center.0 - offset, center.1 - offset, center.2 - offset));
-        vertices.push((center.0 + offset, center.1 - offset, center.2 - offset));
-        vertices.push((center.0 - offset, center.1 + offset, center.2 - offset));
-        vertices.push((center.0 + offset, center.1 + offset, center.2 - offset));
-
-        let mut polypaths = Vec::<(usize, usize, usize)>::new();
-        let cube_paths = [
-            [0, 1, 2],
-            [3, 2, 1],
-            [0, 2, 4],
-            [6, 4, 2],
-            [2, 3, 6],
-            [7, 6, 3],
-            [1, 3, 5],
-            [7, 5, 3],
-            [0, 1, 4],
-            [5, 4, 1],
-            [4, 5, 6],
-            [7, 6, 5],
-        ];
-
-        let cube_vertex_index_path = cube_paths
-            .iter()
-            .map(|path| {
-                path.iter()
-                    .map(|index| index + starting_index)
-                    .collect::<Vec<usize>>()
-            })
-            .collect::<Vec<Vec<usize>>>();
-
-        cube_vertex_index_path.iter().for_each(|path| {
-            polypaths.push((
-                *path.get(0).unwrap(),
-                *path.get(1).unwrap(),
-                *path.get(2).unwrap(),
-            ));
-        });
-
-        (vertices, polypaths)
     }
 }

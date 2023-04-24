@@ -43,7 +43,8 @@ impl Brgc {
 
 #[cfg(test)]
 mod tests {
-    use crate::brgc::Brgc;
+
+    use crate::Brgc;
     #[test]
     fn take_16_gray_codes() {
         let brgc = Brgc { index: 0 };

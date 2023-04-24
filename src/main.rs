@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let out_dir = PathBuf::from(&args[3]);
 
     let hilbert_curve = HilbertCurve::new(*n, *p).unwrap();
-    let linear_path = LinearPath::from_vec(hilbert_curve.coordinates, *n, *p).unwrap();
+    let linear_path = LinearPath::from_vec(hilbert_curve.coordinates, *p).unwrap();
     let pipes_and_boxes = linear_path.to_2d_edges_and_vertices_obj(0.25);
     pipes_and_boxes.write(out_dir)?;
 

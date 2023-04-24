@@ -6,8 +6,9 @@ A WIP Hilbert Space-Filling Curve generator
 
 ### BRGC
 
-Brgc is the Binary Reflected Gray Code Iterator Implementation
-This project generates the cartesian coordinates of each vertex in the
+Brgc is the Binary Reflected Gray Code Iterator
+
+This module generates the cartesian coordinates of each vertex in the
 HSFC using a technique that begins with a list of the first n binary
 numbers counted using the Binary Reflected Gray Code counting system.
 
