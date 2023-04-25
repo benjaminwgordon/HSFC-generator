@@ -9,7 +9,7 @@ use std::{env, error::Error, path::PathBuf};
  *      allowed values: [2,3]
  *      
  *  p: the number of bits to allocate for each coordinate
- *      allowed values: [2,3]
+ *      allowed values: [0,8]
  *      (each axis of your resulting curve will have 2^p vertices)
  *          
  *  target: the relative path to write the resulting OBJ file contents to
