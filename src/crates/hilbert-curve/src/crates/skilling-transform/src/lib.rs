@@ -38,9 +38,11 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
 
 fn into_bit_vec(int: u32, length: usize) -> Vec<bool> {
     let mut bitvec = Vec::<bool>::new();
+    // for each bit of the input u32, push a boolean into the bitvec
     format!("{int:b}")
         .chars()
         .for_each(|bit| bitvec.push(bit == '1'));
+
     // prepend leading 0's to prevent out of bounds issues later
     let leading_false_count = length - bitvec.len();
     let mut leading = Vec::<bool>::new();

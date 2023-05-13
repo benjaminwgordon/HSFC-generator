@@ -1,5 +1,5 @@
 [package]
-name = "hilbert-in-cartesian"
+name = "hilbert_curve_generator"
 version = "0.1.0"
 edition = "2021"
 

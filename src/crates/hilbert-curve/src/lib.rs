@@ -13,6 +13,7 @@ use std::error::Error;
  * The resulting Vector of (u32,u32,u32) represents the ordered traversal of each
  * (x,y,z) vertex in a Hilbert space filling curve defined by n and p.
  */
+#[derive(Debug)]
 pub struct HilbertCurve {
     pub coordinates: Vec<(u32, u32, u32)>,
 }
@@ -86,16 +87,16 @@ pub fn into_xyz_binary_3d(hilbert_coordinates: u32, n: u32, p: u32) -> (u32, u32
     let binary_hilbert_encoded_coordinates = format!("{:b}", hilbert_coordinates);
     // insert any necessary leading zeros so that the string is N * P characters
     // this is necessary to ensure each bit is correctly
-    //      assigned to its x,y, or z axis
+    // assigned to its x,y, or z axis
     let mut padding = String::new();
     while binary_hilbert_encoded_coordinates.len() + padding.len() < (n * p) as usize {
         padding.push_str("0");
     }
     padding.push_str(&binary_hilbert_encoded_coordinates);
     let padded_hilbert_coordinate_string = padding;
-    // take every nth character and assign it to its axis
-    // two axis decoding, only x and y coordinates
 
+    // take every nth character and assign it to its axis
+    // three axis decoding, x,y,z coordinates
     let x = padded_hilbert_coordinate_string
         .chars()
         .step_by(3)

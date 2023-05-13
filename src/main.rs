@@ -1,4 +1,4 @@
-use hilbert_in_cartesian::{HilbertCurve, LinearPath};
+use hilbert_curve_generator::{HilbertCurve, LinearPath};
 use std::{env, error::Error, path::PathBuf};
 
 /**
@@ -20,6 +20,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let n = &args[1].parse::<u32>().unwrap();
     let p = &args[2].parse::<u32>().unwrap();
+
     let out_dir = PathBuf::from(&args[3]);
 
     let hilbert_curve = HilbertCurve::new(*n, *p).unwrap();
