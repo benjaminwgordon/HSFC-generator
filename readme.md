@@ -1,12 +1,10 @@
-# HSFC-Generator
+# Hilbert-Curve-Generator
 
-A WIP Hilbert Space-Filling Curve generator with a built-in OBJ generator for rendering the curves
-
-Intended for use as a library, but contains a main.rs file with example usage.
+A WIP Hilbert Space-Filling Curve Coordinate Generator. Can produce cartesian coordinates for the vertices of a Hilbert Space-Filling Curve in 2 or 3 dimensions using the Skilling Transform Method.
 
 ## Project Structure:
 
-### [Hilbert-Curve](./src/crates/hilbert-curve)
+### Hilbert-Curve
 
 This module contains functionality for generating the Cartesian coordinates of the vertices in a Hilbert Space-Filling Curve in both 2D and 3D.
 
@@ -15,26 +13,32 @@ It also contains utility functions for converting the output vertices into diffe
 - (x,y,z) in binary
 - (x,y,z) in decimal
 
-### [Linear-Path](./src/crates/linear-path)
+### BRGC
 
-This module contains functionality for generating OBJ files from the cartesian coordinates of a Hilbert Curve.
+Brgc is the Binary Reflected Gray Code Iterator
 
-These are useful for visualizing the output of the Hilbert Curve generator, and can be readily rendered by uploading to an online OBJ file renderer.
+This module generates the cartesian coordinates of each vertex in the
+HSFC using a technique that begins with a list of the first n binary
+numbers counted using the Binary Reflected Gray Code counting system.
 
-## Examples:
+The iterator exposed by this module can be used to generate
+points in a BRGC of any magnitude, although for the typical purposes
+of generating square hilbert curves and cubic hilbert cubes, the number
+of generated points will typically be p^n, where n is the number of dimensions
+for the resulting cartesian coordinates (2D and 3D currently supported), and p
+is the number of data bits for each coordinate (each side of your square/cube
+will have 2^p vertices)
 
-### n2, p2
+## Skilling_Transform
 
-![n2 p2 hilbert cube](./readme_images/n2p2.png)
+This module contains functions for applying the Skilling Transform to an existing
+Vec<u32> of BRGC.
 
-### n3, p2
+The Skilling Transform is an algorithm for generating the cartesian coordinates of
+vertices in a Hilbert curve without using the traditional recursive method.
 
-![n3 p2 hilbert cube](./readme_images/n3p2.png)
-
-### n=2, p=4
-
-![n2 p4 hilbert cube](./readme_images/n2p4.png)
-
-### n=3, p=4
-
-![n3 p4 hilbert cube](./readme_images/n3p4.png)
+I've optimized for readability and ease of understanding in the code,
+since the algorithm is not immediately clear. There was a good deal of trial
+and error in implementing this algorithm. If I spend more time on this project,
+I'll try replacing all the string manipulation with bit manipulation and benchmark
+the speed difference.

@@ -6,5 +6,3 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hilbert-curve = {path = "./src/crates/hilbert-curve", version="0.0.0"}
-linear-path = {path = "./src/crates/linear-path", version="0.0.0"}

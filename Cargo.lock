@@ -3,43 +3,5 @@
 version = 3
 
 [[package]]
-name = "brgc"
-version = "0.0.0"
-
-[[package]]
-name = "glam"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e4afd9ad95555081e109fe1d21f2a30c691b5f0919c67dfa690a2e1eb6bd51c"
-
-[[package]]
-name = "hilbert-curve"
-version = "0.0.0"
-dependencies = [
- "brgc",
- "skilling-transform",
-]
-
-[[package]]
 name = "hilbert_curve_generator"
 version = "0.1.0"
-dependencies = [
- "hilbert-curve",
- "linear-path",
-]
-
-[[package]]
-name = "linear-path"
-version = "0.0.0"
-dependencies = [
- "glam",
- "obj",
-]
-
-[[package]]
-name = "obj"
-version = "0.0.0"
-
-[[package]]
-name = "skilling-transform"
-version = "0.0.0"

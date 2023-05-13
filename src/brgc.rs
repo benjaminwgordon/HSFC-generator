@@ -40,33 +40,3 @@ impl Brgc {
         out
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    use crate::Brgc;
-    #[test]
-    fn take_16_gray_codes() {
-        let brgc = Brgc { index: 0 };
-        let result: Vec<u32> = brgc.take(16).collect();
-        let first_16_brgc_expected = [
-            0b0000u32, 0b0001u32, 0b0011u32, 0b0010u32, 0b0110u32, 0b0111u32, 0b0101u32, 0b0100u32,
-            0b1100u32, 0b1101u32, 0b1111u32, 0b1110u32, 0b1010u32, 0b1011u32, 0b1001u32, 0b1000u32,
-        ];
-        assert_eq!(result, Vec::from(first_16_brgc_expected));
-    }
-
-    #[test]
-    fn convert_first_16_graycodes_to_binary() {
-        let brgc = Brgc { index: 0 };
-        let result: Vec<u32> = brgc
-            .take(16)
-            .map(|gray| Brgc::binary_from_gray(gray))
-            .collect();
-        let first_16_standard_binary = [
-            0b0000u32, 0b0001u32, 0b0010u32, 0b0011u32, 0b0100u32, 0b0101u32, 0b0110u32, 0b0111u32,
-            0b1000u32, 0b1001u32, 0b1010u32, 0b1011u32, 0b1100u32, 0b1101u32, 0b1110u32, 0b1111u32,
-        ];
-        assert_eq!(result, first_16_standard_binary);
-    }
-}
