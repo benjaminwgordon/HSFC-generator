@@ -27,8 +27,7 @@ fn hilbert_index_to_hilbert_coordinates(hilbert_index: &u32, n: u32, p: u32) -> 
             // flip all lower-order bits of the corresponding dimension (x, y, or z)
             let mut i = n as usize * p as usize - n as usize;
             while i > r && i >= n as usize {
-                let temp = hilbert_index_bitvec[i];
-                let _ = std::mem::replace(&mut hilbert_index_bitvec[i], !temp);
+                hilbert_index_bitvec[i] = !hilbert_index_bitvec[i];
                 i -= n as usize;
             }
         }

@@ -24,10 +24,6 @@ impl HilbertCurve {
             return Err("invalid value for n | allowed values for n are 2 and 3".into());
         }
 
-        if !(p <= 8) {
-            return Err("invalid value for p | allowed values for p are [0,8]".into());
-        }
-
         let brgc = brgc::Brgc { index: 0 };
         let num_vertices = u32::pow(u32::pow(2, p), n).try_into().unwrap();
         let brgc_vec = brgc.take(num_vertices).collect();
