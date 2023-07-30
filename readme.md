@@ -17,9 +17,9 @@ It also contains utility functions for converting the output vertices into diffe
 
 Brgc is the Binary Reflected Gray Code Iterator
 
-This module generates the cartesian coordinates of each vertex in the
-HSFC using a technique that begins with a list of the first n binary
-numbers counted using the Binary Reflected Gray Code counting system.
+This module exposes an iterator that counts using the Binary Reflected Gray Code.
+This counting system has unique properties that make it the ideal starting point 
+for generating the coordinates of a Hilbert Curve.
 
 The iterator exposed by this module can be used to generate
 points in a BRGC of any magnitude, although for the typical purposes
