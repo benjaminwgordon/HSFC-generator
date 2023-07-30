@@ -1,6 +1,6 @@
 # Hilbert-Curve-Generator
 
-A WIP Hilbert Space-Filling Curve Coordinate Generator. Can produce cartesian coordinates for the vertices of a Hilbert Space-Filling Curve in 2 or 3 dimensions using the Skilling Transform Method.
+A Hilbert Space-Filling Curve Coordinate Generator. Can produce cartesian coordinates for the vertices of a Hilbert Space-Filling Curve in 2 or 3 dimensions using the Skilling Transform Method.
 
 ## Project Structure:
 
